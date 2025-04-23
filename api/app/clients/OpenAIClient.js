@@ -189,8 +189,7 @@ class OpenAIClient extends BaseClient {
 
     if (this.maxPromptTokens + this.maxResponseTokens > this.maxContextTokens) {
       throw new Error(
-        `maxPromptTokens + max_tokens (${this.maxPromptTokens} + ${this.maxResponseTokens} = ${
-          this.maxPromptTokens + this.maxResponseTokens
+        `maxPromptTokens + max_tokens (${this.maxPromptTokens} + ${this.maxResponseTokens} = ${this.maxPromptTokens + this.maxResponseTokens
         }) must be less than or equal to maxContextTokens (${this.maxContextTokens})`,
       );
     }
@@ -426,12 +425,11 @@ class OpenAIClient extends BaseClient {
       this.options.attachments = files;
     }
 
-    if (this.message_file_map) {
-      this.contextHandlers = createContextHandlers(
-        this.options.req,
-        orderedMessages[orderedMessages.length - 1].text,
-      );
-    }
+    // Create context handlers for every message, not just when files are attached
+    this.contextHandlers = createContextHandlers(
+      this.options.req,
+      orderedMessages[orderedMessages.length - 1].text,
+    );
 
     const formattedMessages = orderedMessages.map((message, i) => {
       const formattedMessage = formatMessage({
@@ -1010,8 +1008,7 @@ ${convo}
       if (this.options.debug) {
         logger.debug('[OpenAIClient] summaryTokenCount', summaryTokenCount);
         logger.debug(
-          `[OpenAIClient] Summarization complete: remainingContextTokens: ${remainingContextTokens}, after refining: ${
-            remainingContextTokens - summaryTokenCount
+          `[OpenAIClient] Summarization complete: remainingContextTokens: ${remainingContextTokens}, after refining: ${remainingContextTokens - summaryTokenCount
           }`,
         );
       }
